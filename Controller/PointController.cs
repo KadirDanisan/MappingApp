@@ -1,5 +1,5 @@
 ﻿using MappingApp.Interfaces;
-using MappingApp.Services;
+using MappingApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MappingApp.Controllers
@@ -10,55 +10,44 @@ namespace MappingApp.Controllers
     {
         private readonly IPointService _pointService;
 
-
         public PointController(IPointService pointService)
         {
             _pointService = pointService;
         }
 
         [HttpGet]
-        public ActionResult<Response<List<Point>>> GetAll()
+        public ActionResult<Response<List<PointDto>>> GetAll()
         {
             var response = _pointService.GetAll();
-            return Ok(response); 
+            return Ok(response);
         }
+
         [HttpPost]
-        public ActionResult<Response<Point>> AddPoint([FromBody] Point point)
+        public IActionResult AddPoint([FromBody] PointDto point)
         {
             var response = _pointService.AddPoint(point);
-
-             return CreatedAtAction(nameof(GetById), new { id = point.Id }, response);
-          
+            return CreatedAtAction(nameof(GetById), new { id = response.Values.Id }, response);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Response<Point>> GetById(int id)
+        public ActionResult<Response<PointDto>> GetById(int id)
         {
             var response = _pointService.GetById(id);
-     
-            return Ok(response); 
-
+            return Ok(response);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Response<Point>> UpdatePoint(int id, Point updatePoint)
+        public ActionResult<Response<PointDto>> UpdatePoint(int id, PointDto updatePoint)
         {
             var response = _pointService.UpdatePoint(id, updatePoint);
-             return Ok(response); 
-
+            return Ok(response);
         }
 
         [HttpDelete("{id}")]
         public ActionResult<Response<bool>> DeletePoint(int id)
         {
             var response = _pointService.DeletePoint(id);
-            return Ok(response);       
+            return Ok(response);
         }
     }
 }
-// CONTROLLER İÇERİSİNDE SADELEŞME İNTERFACE OLUŞTURUP SERVİCE DOSYASI OLUŞTUR 
-// response adı alan 3 parametre alan value status error.message 
-
-//htpp["(action)"] ? 
-// IActionResult & ActionResult çalışma mantık farkı ?  kendin araşatır 
-//private readonly List<blabla> ? 

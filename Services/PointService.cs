@@ -1,42 +1,51 @@
 ﻿using MappingApp.Interfaces;
-using Microsoft.AspNetCore.Http.HttpResults;
+using MappingApp.Models;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MappingApp.Services
 {
     public class PointService : IPointService
     {
-        private static readonly List<Point> _pointList = new List<Point>();
+        private readonly MappingAppDbContext _dbContext;
+
+        public PointService(MappingAppDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
         private Response<T> CreateResponse<T>(T values, string status, string message)
         {
             return new Response<T>(values, status, message);
         }
 
-        public Response<List<Point>> GetAll()
+        public Response<List<PointDto>> GetAll()
         {
-            return CreateResponse(_pointList, "200", "Liste getirildi!");
-        }
-        public Response<Point> AddPoint(Point point)
-        {
-            _pointList.Add(point);
-            return CreateResponse(point, "201", "Listeye ekleme işlemi gerçekleşdi !");
-           
+            var points = _dbContext.Points.ToList(); // Veritabanından tüm noktaları al
+            return CreateResponse(points, "200", "Liste getirildi!");
         }
 
-        public Response<Point> GetById(int id)
+        public Response<PointDto> AddPoint(PointDto point)
         {
-            var point = _pointList.FirstOrDefault(p => p.Id == id);
+            _dbContext.Points.Add(point); // Yeni noktayı ekle
+            _dbContext.SaveChanges(); // Değişiklikleri kaydet
+            return CreateResponse(point, "201", "Listeye ekleme işlemi gerçekleşti!");
+        }
+
+        public Response<PointDto> GetById(int id)
+        {
+            var point = _dbContext.Points.FirstOrDefault(p => p.Id == id);
             if (point != null)
             {
-                return CreateResponse(point, "200", "İstenilen ID bulundu !");
-          
+                return CreateResponse(point, "200", "İstenilen ID bulundu!");
             }
-            //NULL KULLANAMADIK DEFAULT ATIK BURAYA
-            return CreateResponse(default(Point), "400", "İstenilen ID bulunamadı!");       
+
+            return CreateResponse<PointDto>(null, "404", "İstenilen ID bulunamadı!"); // Type argument belirttik
         }
 
-        public Response<Point> UpdatePoint(int id, Point updatePoint)
+        public Response<PointDto> UpdatePoint(int id, PointDto updatePoint)
         {
-            var point = _pointList.FirstOrDefault(p => p.Id == id);
+            var point = _dbContext.Points.FirstOrDefault(p => p.Id == id);
             if (point != null)
             {
                 point.PointX = updatePoint.PointX;
@@ -44,26 +53,24 @@ namespace MappingApp.Services
                 point.Name = updatePoint.Name;
                 point.Description = updatePoint.Description;
 
-                return CreateResponse(point, "200", "İstenilen güncelleme gerçekleşti !");
+                _dbContext.SaveChanges(); // Değişiklikleri kaydet
+                return CreateResponse(point, "200", "İstenilen güncelleme gerçekleşti!");
             }
 
-            return CreateResponse(default(Point), "400", "İstenilen güncelleme gerçekleşmedi !");
+            return CreateResponse<PointDto>(null, "404", "İstenilen güncelleme gerçekleşmedi!"); // Type argument belirttik
         }
 
         public Response<bool> DeletePoint(int id)
         {
-            var point = _pointList.FirstOrDefault(p => p.Id == id);
+            var point = _dbContext.Points.FirstOrDefault(p => p.Id == id);
             if (point != null)
             {
-                _pointList.Remove(point);
-                return CreateResponse(true, "200", "Silme işlemi gerçekleşti !");
- 
+                _dbContext.Points.Remove(point);
+                _dbContext.SaveChanges(); // Değişiklikleri kaydet
+                return CreateResponse(true, "200", "Silme işlemi gerçekleşti!");
             }
 
-            return CreateResponse(false, "400", "Silme işlemi gerçekleşmedi !");
+            return CreateResponse<bool>(false, "404", "Silme işlemi gerçekleşmedi!"); // Type argument belirttik
         }
     }
 }
-// response class ayırılacak ve enpointslerde ayrılacak
-// service açılcak database değişiklikleri için servis
-//db baglıycaz sql elle yazılcak 

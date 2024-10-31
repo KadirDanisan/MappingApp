@@ -1,21 +1,19 @@
 using MappingApp.Interfaces;
+using MappingApp.Models;
 using MappingApp.Services;
-using Npgsql;
-using System.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// POSTGRESQL
-builder.Services.AddScoped<IPointService>(sp =>
-{
-    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-    return new PointInsertService(connectionString);
-});
+// PostgreSQL Baðlantýsý
+builder.Services.AddDbContext<MappingAppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Dependency Injection Kayýtlarý
+builder.Services.AddScoped<IPointService, PointService>();
 
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
-
 
 var app = builder.Build();
 

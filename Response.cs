@@ -1,4 +1,4 @@
-﻿namespace MappingApp
+﻿namespace MappingApp.Models
 {
     public class Response<T>
     {

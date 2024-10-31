@@ -1,13 +1,13 @@
-﻿using MappingApp.Services;
+﻿using MappingApp.Models;
 
 namespace MappingApp.Interfaces
 {
     public interface IPointService
     {
-        Response<List<Point>> GetAll();
-        Response<Point> GetById(int id);
-        Response<Point> AddPoint(Point point);
-        Response<Point> UpdatePoint(int id, Point updatePoint);
+        Response<List<PointDto>> GetAll();
+        Response<PointDto> GetById(int id);
+        Response<PointDto> AddPoint(PointDto point);
+        Response<PointDto> UpdatePoint(int id, PointDto updatePoint);
         Response<bool> DeletePoint(int id);
     }
 }
