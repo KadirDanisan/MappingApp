@@ -14,7 +14,7 @@ namespace MappingApp.Interfaces
         public Repository(MappingAppDbContext context)
         {
             _context = context;
-            _dbSet = context.Set<T>(); // Burada DbSet'i alıyoruz
+            _dbSet = context.Set<T>();
         }
 
         public virtual Response<List<T>> GetAll()

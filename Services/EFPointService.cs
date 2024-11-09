@@ -1,43 +1,49 @@
 ﻿using MappingApp.Interfaces;
 using MappingApp.Models;
-using MappingApp.Repository.Point;
+using MappingApp.UnitOfWorks;
 using System.Collections.Generic;
 
 namespace MappingApp.Services
 {
     public class EFPointService : IPointService
     {
-        private readonly IPointRepository _pointRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public EFPointService(IPointRepository pointRepository)
+        public EFPointService(IUnitOfWork unitOfWork)
         {
-            _pointRepository = pointRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public Response<List<PointDto>> GetAll()
         {
-            return _pointRepository.GetAll();
+            return _unitOfWork.Points.GetAll();
         }
 
         public Response<PointDto> GetById(int id)
         {
-            return _pointRepository.GetById(id);
+            return _unitOfWork.Points.GetById(id);
         }
 
         public Response<PointDto> AddPoint(PointDto point)
         {
-            return _pointRepository.Add(point);
+            var response = _unitOfWork.Points.Add(point);
+            _unitOfWork.Complete(); 
+            return response;
         }
 
         public Response<PointDto> UpdatePoint(int id, PointDto updatePoint)
         {
-            updatePoint.Id = id; 
-            return _pointRepository.Update(updatePoint);
+            updatePoint.Id = id;
+            var response = _unitOfWork.Points.Update(updatePoint);
+            _unitOfWork.Complete(); 
+            return response;
         }
 
         public Response<bool> DeletePoint(int id)
         {
-            return _pointRepository.Delete(id);
+            var response = _unitOfWork.Points.Delete(id);
+            _unitOfWork.Complete(); 
+            return response;
         }
     }
 }

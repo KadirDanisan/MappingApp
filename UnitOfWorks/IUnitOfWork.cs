@@ -1,9 +1,12 @@
-﻿//using MappingApp.Repository;
+﻿using MappingApp.Interfaces;
+using MappingApp.Repository;
+using MappingApp.Repository.Point;
 
-//namespace MappingApp.UnitOfWorks
-//{
-//    public interface IUnitOfWork : IDisposable
-//    {
-//        IRepository<T> Repository <T>() where T : ;
-//    }
-//}
+namespace MappingApp.UnitOfWorks
+{
+    public interface IUnitOfWork : IDisposable
+    {
+        IPointRepository Points { get; }
+        int Complete();
+    }
+}
